@@ -1,0 +1,10 @@
+<h2>Lab: SQLi (Login)</h2>
+<p class="muted">This page demonstrates insecure vs secure query handling depending on MODE.</p>
+
+<form method="post" action="/labs/sqli/login" class="form">
+  <label>Username <input name="username" /></label>
+  <label>Password <input name="password" type="password" /></label>
+  <button type="submit">Login</button>
+</form>
+
+<p class="msg">{{message}}</p>

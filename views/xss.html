@@ -1,0 +1,7 @@
+<h2>Lab: Reflected XSS</h2>
+<form method="get" action="/labs/xss" class="form">
+  <label>Query <input name="q" value="{{q}}" /></label>
+  <button type="submit">Submit</button>
+</form>
+
+<p class="msg">{{message}}</p>

@@ -1,0 +1,14 @@
+{
+    "name": "my-vuln-lab",
+    "private": true,
+    "type": "module",
+    "scripts": {
+      "dev": "node server.js",
+      "reset": "node seed.js"
+    },
+    "dependencies": {
+      "better-sqlite3": "^9.4.0",
+      "cookie-parser": "^1.4.6",
+      "express": "^4.19.2"
+    }
+  }
