@@ -2,3 +2,4 @@ flask
 python-dotenv
 azure-identity
 azure-mgmt-containerinstance
+groq

@@ -1,6 +1,7 @@
 import logging
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from dotenv import load_dotenv
+from services.ai_assistant import CyberMentor
 
 from config import Config
 from services.azure_manager import AzureContainerManager
@@ -9,6 +10,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+ai_assistant = CyberMentor()
 
 try:
     aci_manager = AzureContainerManager()
@@ -40,6 +42,19 @@ def start_lab():
             "status": "error", 
             "message": "Internal Error on Azure connection."
         }), 500
+
+@app.route("/ask-ai", methods=["POST"])
+def ask_ai():
+    data = request.json
+    question = data.get("question")
+    lab_type = data.get("lab_type", "General Cybersecurity")
+
+    if not question:
+        return jsonify({"error": "The question is missing"}), 400
+
+    response = ai_assistant.get_help(question, lab_type)
+
+    return jsonify({"answer": response})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
