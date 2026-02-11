@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Range Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .btn-cyber { background-color: #3b82f6; color: white; border: none; }
+        .btn-cyber:hover { background-color: #2563eb; }
+        .status-box { background-color: #0f172a; padding: 15px; border-radius: 5px; border: 1px solid #334155; font-family: monospace; color: #10b981; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1>🛡️ Cyber Range Platform</h1>
+        <p class="text-secondary">Platformă educațională pentru testarea vulnerabilităților</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg">
+                <img src="https://img.freepik.com/free-vector/hacker-activity-concept-illustration_114360-5412.jpg?w=740" class="card-img-top" alt="Hacker" style="height: 200px; object-fit: cover; opacity: 0.8;">
+                <div class="card-body">
+                    <h5 class="card-title">Laborator: IDOR / SQLi</h5>
+                    <p class="card-text text-secondary">
+                        Învață cum să exploatezi vulnerabilități de tip Insecure Direct Object Reference sau SQL Injection.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <button id="startBtn" onclick="startLab()" class="btn btn-cyber btn-lg">
+                            🚀 Pornește Laboratorul
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div id="statusBox" class="status-box">
+                <span id="statusText">Se inițializează...</span>
+                <div class="spinner-border spinner-border-sm text-success ms-2" role="status" id="spinner"></div>
+            </div>
+            
+            <div id="resultBox" class="alert alert-success mt-3 text-center" style="display: none;">
+                <h4>✅ Laborator Pregătit!</h4>
+                <p>Accesează instanța ta aici:</p>
+                <a id="labLink" href="#" target="_blank" class="btn btn-success fw-bold">Deschide Laboratorul</a>
+            </div>
+             <div id="errorBox" class="alert alert-danger mt-3 text-center" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function startLab() {
+        const btn = document.getElementById('startBtn');
+        const statusBox = document.getElementById('statusBox');
+        const statusText = document.getElementById('statusText');
+        const resultBox = document.getElementById('resultBox');
+        const errorBox = document.getElementById('errorBox');
+        
+        // Resetăm interfața
+        btn.disabled = true;
+        resultBox.style.display = 'none';
+        errorBox.style.display = 'none';
+        statusBox.style.display = 'block';
+        statusText.innerText = "⏳ Comunic cu Azure... (Poate dura 1-2 minute)";
+
+        try {
+            // Facem cererea către backend-ul nostru Python
+            const response = await fetch('/start-lab', { method: 'POST' });
+            const data = await response.json();
+
+            if (response.ok) {
+                statusBox.style.display = 'none';
+                resultBox.style.display = 'block';
+                
+                // Setăm link-ul primit
+                const linkElement = document.getElementById('labLink');
+                linkElement.href = data.url;
+                linkElement.innerText = "🔗 " + data.url;
+            } else {
+                throw new Error(data.error || "Eroare necunoscută");
+            }
+
+        } catch (error) {
+            statusBox.style.display = 'none';
+            errorBox.style.display = 'block';
+            errorBox.innerText = "❌ Eroare: " + error.message;
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
