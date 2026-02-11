@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>IDOR Lab</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <style>
+        /* Chat widget */
+        #chatToggle {
+            position: fixed; bottom: 24px; right: 24px;
+            width: 56px; height: 56px; border-radius: 50%;
+            border: none; background: #2563eb; color: #fff; font-size: 22px;
+            box-shadow: 0 8px 20px rgba(0,0,0,.2);
+            cursor: pointer;
+        }
+        #chatWindow {
+            position: fixed; bottom: 90px; right: 24px;
+            width: 340px; height: 420px; display: none;
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,.15);
+            overflow: hidden;
+        }
+        #chatHeader {
+            background: #2563eb; color: #fff; padding: 10px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        #chatBody {
+            height: 300px; overflow-y: auto; padding: 12px;
+            background: #ffffff;
+        }
+        .msg { margin: 8px 0; max-width: 80%; padding: 8px 10px; border-radius: 8px; }
+        .me { background: #dbeafe; margin-left: auto; }
+        .ai { background: #f1f5f9; border: 1px solid #e2e8f0; }
+        #chatFooter { padding: 10px; border-top: 1px solid #e2e8f0; }
+        #chatInput { width: 100%; padding: 8px; }
+    </style>
+</head>
+<body>
+    Main page
+
+    <button id="chatToggle" onclick="toggleChat()">🤖</button>
+
+    <div id="chatWindow">
+        <div id="chatHeader">
+            <span>Cyber Mentor AI</span>
+            <button onclick="toggleChat()" style="background:transparent;border:none;color:#fff;font-size:18px;">✕</button>
+        </div>
+        <div id="chatBody">
+            <div class="msg ai">Pune o întrebare despre laborator.</div>
+        </div>
+        <div id="chatFooter">
+            <input id="chatInput" type="text" placeholder="Întreabă ceva..." onkeypress="handleEnter(event)" />
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const chat = document.getElementById('chatWindow');
+            chat.style.display = (chat.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const chatBody = document.getElementById('chatBody');
+            const question = input.value.trim();
+            if (!question) return;
+
+            chatBody.innerHTML += `<div class="msg me">${question}</div>`;
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            const loading = document.createElement('div');
+            loading.className = 'msg ai';
+            loading.textContent = 'Se gândește...';
+            chatBody.appendChild(loading);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+                const response = await fetch('/ask-ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question, lab_type: "SQL Injection" })
+                });
+                const data = await response.json();
+                loading.remove();
+                chatBody.innerHTML += `<div class="msg ai">🤖 ${data.answer}</div>`;
+            } catch (error) {
+                loading.textContent = 'Eroare conexiune.';
+            }
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+</body>
+</html>
